@@ -116,7 +116,7 @@ export default {
 
 .description {
     position: absolute;
-    top: 60%;
+    bottom: 130px;
     left: 50%;
     transform: translate(-50%, -50%);
     opacity: 0;
