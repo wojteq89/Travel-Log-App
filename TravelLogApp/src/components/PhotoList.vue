@@ -114,7 +114,7 @@ export default {
 
 .description {
     position: absolute;
-    bottom: -100px;
+    bottom: -70px;
     left: 50%;
     transform: translate(-50%, -50%);
     opacity: 0;
@@ -126,7 +126,7 @@ export default {
 }
 
 .photo-description {
-
+    width: 330px;
 }
 
 .photo-container:hover .description {
