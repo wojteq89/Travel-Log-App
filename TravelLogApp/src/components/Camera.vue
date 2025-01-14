@@ -1,90 +1,132 @@
 <template>
-    <div>
+  <div class="main-container">
+      <button class="take-photo-button" v-if="!photo" @click="takePhoto">
+          <i class="fas fa-camera"></i>
+          <br> Take a photo
+      </button>
+
+      <div v-if="photo" class="photo-details">
+        <button class="save-button" @click="savePhoto">
+          <i class="fas fa-save"></i> <br><br> Save Photo</button>
+        <input class="inputs" v-model="photoName" placeholder="Enter photo name" />
+        <input class="inputs" v-model="photoDescription" placeholder="Enter photo description" />
+      </div>
+  </div>
+</template>
+
   
-      <main>
-        <button @click="takePhoto">
-            <i class="fas fa-camera"></i>
-            <br> Take a photo
-        </button>
-  
-        <div v-if="photo" class="photo-details">
-          <input v-model="photoName" placeholder="Enter photo name" />
-          <textarea v-model="photoDescription" placeholder="Enter photo description"></textarea>
-          <button @click="savePhoto">Save Photo</button>
-        </div>
-      </main>
-    </div>
-  </template>
-  
-  <script>
-  import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-  import { mapActions } from 'vuex';
-  
-  export default {
+<script>
+import {
+    Camera,
+    CameraResultType,
+    CameraSource
+} from '@capacitor/camera';
+import {
+    mapActions
+} from 'vuex';
+
+export default {
     name: 'Camera',
     data() {
-      return {
-        photo: null, // URL zdjęcia
-        photoName: '', // Nazwa zdjęcia
-        photoDescription: '', // Opis zdjęcia
-      };
+        return {
+            photo: null, // URL zdjęcia
+            photoName: '', // Nazwa zdjęcia
+            photoDescription: '', // Opis zdjęcia
+        };
     },
     methods: {
-      ...mapActions(['addPhoto']),
-      async takePhoto() {
-        try {
-          const result = await Camera.getPhoto({
-            resultType: CameraResultType.Uri,
-            source: CameraSource.Camera,
-            quality: 100,
-          });
-  
-          this.photo = result.webPath;
-        } catch (error) {
-          console.error('Error taking photo:', error);
-        }
-      },
-      savePhoto() {
-        const newPhoto = {
-          url: this.photo,
-          name: this.photoName,
-          description: this.photoDescription,
-        };
-  
-        this.addPhoto(newPhoto);
-        this.photo = null; // Resetowanie zdjęcia po zapisaniu
-        this.photoName = ''; // Resetowanie nazwy
-        this.photoDescription = ''; // Resetowanie opisu
-      },
+        ...mapActions(['addPhoto']),
+        async takePhoto() {
+            try {
+                const result = await Camera.getPhoto({
+                    resultType: CameraResultType.Uri,
+                    source: CameraSource.Camera,
+                    quality: 100,
+                });
+
+                this.photo = result.webPath;
+            } catch (error) {
+                console.error('Error taking photo:', error);
+            }
+        },
+        savePhoto() {
+            const newPhoto = {
+                url: this.photo,
+                name: this.photoName,
+                description: this.photoDescription,
+            };
+
+            this.addPhoto(newPhoto);
+            this.photo = null; // Resetowanie zdjęcia po zapisaniu
+            this.photoName = ''; // Resetowanie nazwy
+            this.photoDescription = ''; // Resetowanie opisu
+        },
     },
-  };
-  </script>
+};
+</script>
+
   
-  <style scoped>
-  
-  button {
+<style scoped>
+
+.main-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
     padding: 20px;
-    border: none;
-    border-radius: 20px;
+    border: 1px solid transparent;
+    border-radius: 50%;
     width: 200px;
     height: 200px;
     cursor: pointer;
-    position: absolute;
-    left: 50%;
-    top: 40%;
-    transform: translate(-50%, -50%);
+    box-shadow: 10px 10px 100px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease-in-out;
+    color: rgb(202, 202, 202);
+}
+
+button:hover {
+  background-color: black;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 10px 10px 100px rgba(255, 255, 255, 0.356);
+}
+
+
+.photo-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+i {
+    font-size: 100px;
+}
+
+.inputs{
+    width: 25%;
+    height: 50px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 20px;
+    border: 1px solid grey;
+    transition: all 0.3s ease-in-out;
   }
 
-  i {
-    font-size: 100px;
+.inputs:focus {
+    width: 80%;
+    text-align: left;
+}
+
+@media only screen and (max-width: 600px) {
+  .inputs {
+    width: 50%;
   }
-  
-  input,
-  textarea {
-    display: block;
-    margin: 10px 0;
-    width: 100%;
-    padding: 10px;
-  }
-  </style>
-  
+}
+</style>
