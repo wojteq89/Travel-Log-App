@@ -1,39 +1,42 @@
 <template>
   <head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  </head>
   <div class="main-container">
-      <button class="take-photo-button" v-if="!photo" @click="takePhoto">
-          <i class="fas fa-camera"></i>
-          <br> Take a photo
+    <button class="take-photo-button" v-if="!photo" @click="takePhoto">
+      <i class="fas fa-camera"></i>
+      <br> Take a photo
+    </button>
+    <div v-if="showToast" class="toast">
+      Photo saved successfully!
+    </div>
+
+    <div v-if="photo" class="photo-details">
+      <button class="save-button" @click="savePhoto">
+        <i class="fas fa-save"></i> <br><br> Save Photo
       </button>
-      <div v-if="showToast" class="toast">
-        Photo saved successfully!
-      </div>
+      <input class="inputs" v-model="photoName" placeholder="Enter photo name" />
+      <input class="inputs" v-model="photoDescription" placeholder="Enter photo description" />
+    </div>
 
-      <div v-if="photo" class="photo-details">
-        <button class="save-button" @click="savePhoto">
-          <i class="fas fa-save"></i> <br><br> Save Photo</button>
-        <input class="inputs" v-model="photoName" placeholder="Enter photo name" />
-        <input class="inputs" v-model="photoDescription" placeholder="Enter photo description" />
-      </div>
-
-      <!-- Custom Toast Notification -->
   </div>
 </template>
 
 <script>
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Geolocation } from '@capacitor/geolocation';
 import { mapActions } from 'vuex';
 
 export default {
   name: 'Camera',
   data() {
     return {
-      photo: null, // URL zdjęcia
-      photoName: '', // Nazwa zdjęcia
-      photoDescription: '', // Opis zdjęcia
-      showToast: false, // Flaga do kontrolowania widoczności toastu
+      photo: null,
+      photoName: '',
+      photoDescription: '',
+      showToast: false,
+      photoDate: '',
+      photoLocation: '',
     };
   },
   methods: {
@@ -47,26 +50,49 @@ export default {
         });
 
         this.photo = result.webPath;
+        this.photoDate = new Date().toLocaleString();
+
+        const position = await Geolocation.getCurrentPosition();
+        await this.fetchAddressFromCoordinates(position.coords.latitude, position.coords.longitude);
+
       } catch (error) {
-        console.error('Error taking photo:', error);
+        console.error('Błąd podczas robienia zdjęcia lub uzyskiwania lokalizacji:', error);
       }
     },
+
+    async fetchAddressFromCoordinates(latitude, longitude) {
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`);
+        const data = await response.json();
+        if (data && data.address) {
+          const city = data.address.city || data.address.town || data.address.village;
+          const country = data.address.country;
+          this.photoLocation = `${city}, ${country}`;
+        }
+      } catch (error) {
+        console.error("Błąd podczas pobierania adresu:", error);
+        this.photoLocation = "Nie udało się uzyskać lokalizacji";
+      }
+    },
+
     savePhoto() {
       const newPhoto = {
         url: this.photo,
         name: this.photoName,
         description: this.photoDescription,
+        date: this.photoDate,
+        location: this.photoLocation,
       };
 
       this.addPhoto(newPhoto);
-      this.photo = null; // Resetowanie zdjęcia po zapisaniu
-      this.photoName = ''; // Resetowanie nazwy
-      this.photoDescription = ''; // Resetowanie opisu
+      this.photo = null;
+      this.photoName = '';
+      this.photoDescription = '';
+      this.photoDate = '';
+      this.photoLocation = '';
 
-      // Show the toast notification
       this.showToast = true;
 
-      // Hide toast after 2 seconds
       setTimeout(() => {
         this.showToast = false;
       }, 2000);

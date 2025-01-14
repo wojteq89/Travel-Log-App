@@ -17,8 +17,10 @@
                     </button>
 
                     <div class="description">
-                        <p class="photo-name">{{ photo.name }}</p>
-                        <p class="photo-description">{{ photo.description }}</p>
+                        <p class="photo-name">Nazwa: {{ photo.name }}</p>
+                        <p class="photo-description">Opis: {{ photo.description }}</p>
+                        <p class="photo-description">Data: {{ photo.date }}</p>
+                        <p class="photo-description">Lokalizacja: {{ photo.location }}</p>
                     </div>
                 </div>
 
@@ -59,23 +61,17 @@ export default {
     methods: {
         ...mapActions(['loadPhotos', 'updatePhoto', 'removePhoto']),
         editPhoto(index) {
-            // Rozpoczynamy edycję, ustawiamy isEditing na true
             this.photos[index].isEditing = true;
         },
         cancelEdit(index) {
-            // Anulowanie edycji, ustawiamy isEditing na false
             this.photos[index].isEditing = false;
-            // Opcjonalnie, jeśli chcesz przywrócić poprzednie wartości:
-            // this.photos[index].name = this.photos[index].originalName;
-            // this.photos[index].description = this.photos[index].originalDescription;
         },
         saveChanges(index) {
-            // Zapisz zmiany
             this.updatePhoto({
                 index,
                 photo: this.photos[index]
             });
-            this.photos[index].isEditing = false; // Po zapisaniu ukrywamy formularz edycji
+            this.photos[index].isEditing = false;
         },
         deletePhoto(index) {
             this.removePhoto(index);
@@ -90,7 +86,9 @@ export default {
 <style scoped>
 
 .no-photos {
-    font-size: 14px;
+    font-size: 25px;
+    text-align: center;
+    margin-top: 200px;
 }
 
 .photo-list {
@@ -110,13 +108,13 @@ export default {
 }
 
 .photo-container:hover {
-    padding-bottom: 250px;
+    padding-bottom: 180px;
     background-color: rgb(63, 63, 63);
 }
 
 .description {
     position: absolute;
-    bottom: 130px;
+    bottom: -100px;
     left: 50%;
     transform: translate(-50%, -50%);
     opacity: 0;

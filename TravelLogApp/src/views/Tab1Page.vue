@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Take a photo</ion-title>
+        <ion-title>Camera</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
