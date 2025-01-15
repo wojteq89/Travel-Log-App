@@ -162,7 +162,6 @@ i {
   }
 }
 
-/* Custom Toast Styles */
 .toast {
   position: absolute;
   bottom: 70px;
